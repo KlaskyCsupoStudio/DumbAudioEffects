@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Basic Ahh Site</title>
+
+<style>
+
+#tt {
+
+color: #ff0000;
+
+font-size: 12px;
+
+}
+
+body {
+
+font-family: Arial, sans-serif;
+
+margin: 0;
+
+padding: 20px;
+
+transition: background-color 0.3s, color 0.3s;
+
+}
+
+body.dark-mode {
+
+background-color: #1a1a1a;
+
+color: #f0f0f0;
+
+}
+
+body.light-mode {
+
+background-color: #f0f0f0;
+
+color: #1a1a1a;
+
+}
+
+.container {
+
+display: grid;
+
+grid-template-columns: 1fr 1fr;
+
+gap: 20px;
+
+}
+
+.panel {
+
+border-radius: 10px;
+
+padding: 20px;
+
+transition: background-color 0.3s;
+
+}
+
+body.dark-mode .panel {
+
+background-color: #2a2a2a;
+
+}
+
+body.light-mode .panel {
+
+background-color: #ffffff;
+
+box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
+}
+
+.controls {
+
+display: flex;
+
+flex-direction: column;
+
+gap: 10px;
+
+}
+
+button, select {
+
+background-color: #0000ff;
+
+color: white;
+
+border: none;
+
+padding: 10px;
+
+border-radius: 5px;
+
+cursor: pointer;
+
+}
+
+.slider-container {
+
+display: flex;
+
+align-items: center;
+
+gap: 10px;
+
+}
+
+.slider-wrapper {
+
+display: flex;
+
+align-items: center;
+
+gap: 10px;
+
+}
+
+input[type="range"] {
+
+flex-grow: 1;
+
+}
+
+input[type="number"] {
+
+width: 60px;
+
+}
+
+#visualizer {
+
+width: 100%;
+
+height: 200px;
+
+background-color: #000;
+
+border-radius: 10px;
+
+}
+
+#customCodeInput {
+
+width: 100%;
+
+height: 100px;
+
+border-radius: 5px;
+
+transition: background-color 0.3s, color 0.3s, border 0.3s;
+
+}
+
+body.dark-mode #customCodeInput {
+
+background-color: #2a2a2a;
+
+color: #f0f0f0;
+
+border: 1px solid #444;
+
+}
+
+body.light-mode #customCodeInput {
+
+background-color: #ffffff;
+
+color: #1a1a1a;
+
+border: 1px solid #ccc;
+
+}
+
+@media (max-width: 768px) {
+
+.container {
+
+grid-template-columns: 1fr;
+
+}
+
+.panel {
+
+padding: 10px;
+
+}
+
+.controls {
+
+gap: 5px;
+
+}
+
+button, select {
+
+padding: 8px;
+
+font-size: 14px;
+
+}
+
+#visualizer {
+
+height: 150px;
+
+order: -1;
+
+}
+
+#customCodeInput {
+
+height: 80px;
+
+}
+
+}
+
+#crashHandler {
+
+background-color: #ff0000;
+
+padding: 10px;
+
+border-radius: 5px;
+
+display: none;
+
+}
+
+body.dark-mode #crashHandler {
+
+background-color: #800000;
+
+color: #f0f0f0;
+
+}
+
+body.light-mode #crashHandler {
+
+background-color: #ff0000;
+
+color: #ffffff;
+
+}
+
+
+
+.switch {
+
+position: relative;
+
+display: inline-block;
+
+width: 60px;
+
+height: 34px;
+
+}
+
+.switch input {
+
+opacity: 0;
+
+width: 0;
+
+height: 0;
+
+}
+
+.slider {
+
+position: absolute;
+
+cursor: pointer;
+
+top: 0;
+
+left: 0;
+
+right: 0;
+
+bottom: 0;
+
+background-color: #ccc;
+
+transition: .4s;
+
+}
+
+.slider:before {
+
+position: absolute;
+
+content: "";
+
+height: 26px;
+
+width: 26px;
+
+left: 4px;
+
+bottom: 4px;
+
+background-color: white;
+
+transition: .4s;
+
+}
+
+input:checked + .slider {
+
+background-color: #FFFFFF;
+
+}
+
+input:focus + .slider {
+
+box-shadow: 0 0 1px #FFFFFF;
+
+}
+
+input:checked + .slider:before {
+
+transform: translateX(26px);
+
+}
+
+.slider.round {
+
+border-radius: 34px;
+
+}
+
+.slider.round:before {
+
+border-radius: 50%;
+
+}
+
+
+
+.video-wrapper {
+
+display: none;
+
+}
+
+
+
+#videoPlayer {
+
+display: none;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<body class="dark-mode">
+
+<div class="container">
+
+<div class="panel">
+
+<h1>Audio Shifter</h1>
+
+<div id="tt">This Is A Shitty Shifter For Audio Effects. When something goes wrong, CONTACT ME AT EMAIL.</div>
+
+<br></br>
+
+<input type="file" id="audioFile" accept="audio/*,video/*">
+
+<div class="video-wrapper">
+
+<video id="videoPlayer" controls></video>
+
+</div>
+
+<div id="audioControls" class="controls">
+
+<button id="playPause">Play/Pause</button>
+
+<div id="audioWarning" style="color: #ff5000; display: none;">You need an audio file</div>
+
+<span id="durationCounter"></span>
+
+<button id="visualiserType">Visualiser: Frequency Log</button>
+
+<button id="saveAudio">Save audio effect</button>
+
+</div>
+
+<div id="filterControls" class="controls">
+
+<h2>Effect Controls</h2>
+
+<select id="filterType">
+
+<option value="pitch">Pitch</option>
+
+</select>
+
+</div>
+
+</div>
+
+</div>
+
+<div id="pitchShiftControls" style="display: none;">
+
+<div class="slider-container">
+
+<label for="pitchShiftSlider">Pitch Shift:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+
+<div class="slider-wrapper">
+
+<input type="range" id="pitchShiftSlider" min="-36" max="36" step="0.1" value="0">
+
+<input type="number" id="pitchShiftInput" min="-36" max="36" step="0.1" value="0">
+
+<span id="pitchShiftValue">semitones</span>
+
+</div>
+
+</div>
+
+<div class="slider-container">
+
+<label for="pitchShiftQualitySlider">Pitch Shift Quality:</label>
+
+<div class="slider-wrapper">
+
+<input type="range" id="pitchShiftQualitySlider" min="8" max="14" step="1" value="11">
+
+<input type="number" id="pitchShiftQualityInput" min="8" max="14" step="1" value="11">
+
+<span id="pitchShiftQualityValue">samples</span>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="slider-container">
+
+<label for="volumeSlider">Volume:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+
+<div class="slider-wrapper">
+
+<input type="range" id="volumeSlider" min="0" max="2" step="0.01" value="1">
+
+<input type="number" id="volumeInput" min="0" max="2" step="0.01" value="1">
+
+<span id="volumeValue">%</span>
+
+</div>
+
+</div>
+
+<div class="slider-container">
+
+<label for="limiterToggle">Limiter:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+
+<div class="slider-wrapper">
+
+<input type="checkbox" id="limiterToggle" checked>
+
+</div>
+
+</div>
+
+<div class="slider-container">
+
+<label for="limiterThresholdSlider">Limiter Threshold:</label>
+
+<div class="slider-wrapper">
+
+<input type="range" id="limiterThresholdSlider" min="-60" max="0" step="0.1" value="-0.5">
+
+<input type="number" id="limiterThresholdInput" min="-60" max="0" step="0.1" value="-0.5">
+
+<span id="limiterThresholdValue">dB</span>
+
+</div>
+
+</div>
+
+<div class="slider-container">
+
+<label for="dcRemovalToggle">DC Removal:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+
+<div class="slider-wrapper">
+
+<input type="checkbox" id="dcRemovalToggle">
+
+</div>
+
+</div>
+
+<div id="crashHandler"></div>
+
+<div class="settings-panel">
+
+<h2>Settings</h2>
+
+<div id="darkModeToggle">
+
+<label class="switch">
+
+<input type="checkbox" id="darkModeSwitch" checked>
+
+<span class="slider round"></span>
+
+</label>
+
+<span id="modeLabel">Dark Mode</span>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="panel">
+
+<canvas id="visualizer"></canvas>
+
+<h2>JS Audio Processing:</h2>
+
+<textarea id="customCodeInput" placeholder="Enter custom JS code here. Use 'x' as the input sample variable. if you wanna use Math.JS you can use 'm' for short" spellcheck="false"></textarea>
+
+<div id="errorContainer" style="color: #00ff00;">Status: OK</div>
+
+</div>
+
+</div>
+
+<script>
+
+        window.onerror = function(message, source, lineno, colno, error) {
+
+            if (message.includes("Cannot read properties of undefined (reading 'start')")) {
+
+                return true; // Suppress this specific error cus I'm lazy
+
+            }
+
+            const crashHandler = document.getElementById('crashHandler');
+
+            crashHandler.style.display = 'block';
+
+            crashHandler.innerHTML = `
+
+                <h3>Oops! Something went wrong.</h3>
+
+                <p>Error: ${message}</p>
+
+                <p>Line: ${lineno}</p>
+
+                <p>Column: ${colno}</p>
+
+                <p>Please refresh the page and try again. If the problem persists, contact D3nschøt (the developer).</p>
+
+            `;
+
+            return true;
+
+        }; // AI created this cus I'm too lazy to add a crash handler LMAO
+
+
+
+        const darkModeSwitch = document.getElementById('darkModeSwitch');
+
+        const body = document.body;
+
+        const modeLabel = document.getElementById('modeLabel');
+
+
+
+        darkModeSwitch.addEventListener('change', () => {
+
+            if (darkModeSwitch.checked) {
+
+                body.classList.remove('light-mode');
+
+                body.classList.add('dark-mode');
+
+                modeLabel.textContent = 'Dark Mode';
+
+            } else {
+
+                body.classList.remove('dark-mode');
+
+                body.classList.add('light-mode');
+
+                modeLabel.textContent = 'Light Mode';
+
+            }
+
+        });
+
+
+
+        let audioContext;
+
+        let audioBuffer;
+
+        let source;
+
+        let filter;
+
+        let gainNode;
+
+        let limiter;
+
+        let analyser;
+
+        let isPlaying = false;
+
+        let visualiserMode = 'frequency-log';
+
+        let startTime;
+
+        let durationInterval;
+
+        let flangerDelay;
+
+        let flangerLFO;
+
+        let flangerGain;
+
+        let flangerFeedback;
+
+        let dcRemovalFilter;
+
+        let vibrato;
+
+        let vibratoGain;
+
+
+
+        const canvas = document.getElementById('visualizer');
+
+        const canvasCtx = canvas.getContext('2d');
+
+        const durationCounter = document.getElementById('durationCounter');
+
+        const filterTypeSelect = document.getElementById('filterType');
+
+        const warningContainer = document.createElement('div');
+
+        warningContainer.id = 'warningContainer';
+
+        warningContainer.style.display = 'none';
+
+        document.body.appendChild(warningContainer);
+
+        m = Math
+
+
+
+        document.getElementById('audioFile').addEventListener('change', async (event) => {
+
+            const file = event.target.files[0];
+
+            if (file.type.startsWith('video/')) {
+
+                try {
+
+                    const audioBlob = await convertVideoToAudio(file);
+
+                    handleAudioFile(audioBlob);
+
+                } catch (error) {
+
+                    console.error('Error converting video to audio:', error);
+
+                    alert('Error converting video to audio. Please try a different file.');
+
+                }
+
+            } else {
+
+                handleAudioFile(file);
+
+            }
+
+        });
+
+        // Detect mobile device again lazy to emplement certain things
+
+        function isMobile() {
+
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        }
+
+
+
+        if (isMobile()) {
+
+            document.body.classList.add('mobile');
+
+        }
+
+
+
+        document.getElementById('filterType').addEventListener('change', (event) => {
+
+            if (isPlaying) {
+
+                source.stop();
+
+                isPlaying = false;
+
+                clearInterval(durationInterval);
+
+            }
+
+            const filterType = event.target.value;
+
+       
